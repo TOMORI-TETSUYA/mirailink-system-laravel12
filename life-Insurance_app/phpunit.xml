@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+>
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Feature">
+            <directory>tests/Feature</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>app</directory>
+        </include>
+    </source>
+    <php>
+        <!--
+            <server> と <env force="true"> の両方が必須です。削除しないでください。
+
+            docker-compose.yml の app サービスは APP_ENV / DB_CONNECTION / DB_DATABASE などを
+            実環境変数としてコンテナへ渡します。これらは PHP から見ると getenv() / $_ENV /
+            $_SERVER のすべてに現れます。
+
+            ここで 2 段階の問題があります。
+              1. PHPUnit の <env> は force="true" が無いと既存の環境変数を上書きしません。
+              2. force="true" を付けても、PHPUnit が書き換えるのは putenv() と $_ENV だけで
+                 $_SERVER は変更されません。一方 Laravel の env() は vlucas/phpdotenv の
+                 DEFAULT_ADAPTERS = [ServerConstAdapter, EnvConstAdapter] の順で読むため、
+                 $_SERVER の値（= compose が渡した mysql / local）が優先されます。
+
+            そのため <server> で $_SERVER を上書きする必要があります。これが無いと、
+            テストが sqlite の :memory: ではなく開発用 MySQL (mirailink) へ接続し、
+            RefreshDatabase が開発データを消去します。また APP_ENV が testing にならないため
+            CSRF 検証が有効なままとなり、POST 系のテストが 419 で失敗します。
+        -->
+        <server name="APP_ENV" value="testing"/>
+        <server name="APP_KEY" value="base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="/>
+        <server name="APP_MAINTENANCE_DRIVER" value="file"/>
+        <server name="BCRYPT_ROUNDS" value="4"/>
+        <server name="CACHE_STORE" value="array"/>
+        <server name="DB_CONNECTION" value="sqlite"/>
+        <server name="DB_DATABASE" value=":memory:"/>
+        <server name="QUEUE_CONNECTION" value="sync"/>
+        <server name="SESSION_DRIVER" value="array"/>
+        <server name="SESSION_ENCRYPT" value="false"/>
+        <server name="CUSTOMER_SEARCH_HMAC_KEY" value="testing-hmac-key-separate-from-app-key"/>
+        <!-- DB_HOST / DB_USERNAME / DB_PASSWORD も残っていると sqlite 設定を汚すため空にします。 -->
+        <server name="DB_HOST" value=""/>
+        <server name="DB_USERNAME" value=""/>
+        <server name="DB_PASSWORD" value=""/>
+
+        <env name="APP_ENV" value="testing" force="true"/>
+        <env name="APP_KEY" value="base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=" force="true"/>
+        <env name="APP_MAINTENANCE_DRIVER" value="file" force="true"/>
+        <env name="BCRYPT_ROUNDS" value="4" force="true"/>
+        <env name="CACHE_STORE" value="array" force="true"/>
+        <env name="DB_CONNECTION" value="sqlite" force="true"/>
+        <env name="DB_DATABASE" value=":memory:" force="true"/>
+        <env name="QUEUE_CONNECTION" value="sync" force="true"/>
+        <env name="SESSION_DRIVER" value="array" force="true"/>
+        <env name="SESSION_ENCRYPT" value="false" force="true"/>
+        <env name="CUSTOMER_SEARCH_HMAC_KEY" value="testing-hmac-key-separate-from-app-key" force="true"/>
+    </php>
+</phpunit>

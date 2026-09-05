@@ -1,0 +1,126 @@
+# MiraiLink - 生命保険顧客管理システム
+# Compose Specification では top-level の version は不要のため記載しません。
+# コンテナ名・ネットワーク名は ASCII のみを使用します（仕様 4.1 命名上の注意）。
+name: mirailink-system
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      args:
+        PHP_IMAGE: ${PHP_IMAGE:-php:8.4.23-fpm-bookworm}
+        APP_UID: ${APP_UID:-1000}
+        APP_GID: ${APP_GID:-1000}
+    container_name: mirailink_system_app
+    working_dir: /var/www/html/life-Insurance_app
+    volumes:
+      - ./:/var/www/html
+    env_file:
+      - ./.env
+    environment:
+      APP_ENV: ${APP_ENV:-local}
+      APP_DEBUG: ${APP_DEBUG:-false}
+      APP_KEY: ${APP_KEY}
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      SESSION_DRIVER: database
+      CACHE_STORE: database
+      QUEUE_CONNECTION: database
+      CUSTOMER_SEARCH_HMAC_KEY: ${CUSTOMER_SEARCH_HMAC_KEY}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - frontend
+      - backend
+    restart: unless-stopped
+
+  nginx:
+    image: ${NGINX_IMAGE:-nginx:1.28.3-alpine}
+    container_name: mirailink_system_nginx
+    ports:
+      - "${APP_PORT:-8080}:80"
+    volumes:
+      - ./:/var/www/html:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - app
+    networks:
+      - frontend
+    restart: unless-stopped
+
+  db:
+    image: ${MYSQL_IMAGE:-mysql:8.4.10}
+    container_name: mirailink_system_db
+    env_file:
+      - ./.env
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      TZ: Asia/Tokyo
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # 初回起動時のみ実行されます（phpMyAdmin 設定ストレージの作成と権限付与）。
+      - ./docker/mysql/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - mysqladmin ping -h 127.0.0.1 -uroot -p"$${MYSQL_ROOT_PASSWORD}" --silent
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - backend
+    restart: unless-stopped
+
+  # MySQL 管理 UI。db は internal ネットワーク上にあるため backend に接続し、
+  # ブラウザから開けるよう frontend にも接続します。
+  # 顧客の機微情報を直接閲覧できるため、公開先は 127.0.0.1 に限定します。
+  phpmyadmin:
+    image: ${PMA_IMAGE:-phpmyadmin:5.2.3-apache}
+    container_name: mirailink_system_phpmyadmin
+    ports:
+      - "127.0.0.1:${PMA_PORT:-8081}:80"
+    volumes:
+      - ./docker/phpmyadmin/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php:ro
+    environment:
+      # 認証は cookie 方式（PMA_USER を設定しないこと）。
+      # 資格情報はコンテナに保持せず、ログイン画面で都度入力します。
+      PMA_HOST: db
+      PMA_PORT: 3306
+      # 設定ストレージ。controluser は使わず、ログインユーザーの権限で読み書きします。
+      PMA_PMADB: phpmyadmin
+      PMA_BLOWFISH_SECRET: ${PMA_BLOWFISH_SECRET}
+      UPLOAD_LIMIT: ${PMA_UPLOAD_LIMIT:-256M}
+      MEMORY_LIMIT: ${PMA_MEMORY_LIMIT:-512M}
+      MAX_EXECUTION_TIME: ${PMA_MAX_EXECUTION_TIME:-600}
+      HIDE_PHP_VERSION: "1"
+      TZ: Asia/Tokyo
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - frontend
+      - backend
+    restart: unless-stopped
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+    internal: true
+
+volumes:
+  mysql_data:

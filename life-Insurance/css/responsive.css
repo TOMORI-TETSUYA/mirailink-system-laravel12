@@ -1,0 +1,794 @@
+/* =====================================================================
+   MiraiLink - responsive.css（仕様書 21.1 ベース、モバイルファースト）
+   ブレークポイント: 768px（タブレット） / 1024px（PC） / 1440px（ワイドPC）
+   ===================================================================== */
+
+:root {
+    --content-max-width: 1440px;
+    --page-gutter: clamp(16px, 3vw, 40px);
+    --section-gap: clamp(20px, 3vw, 36px);
+    --touch-target: 44px;
+    --header-height-mobile: 64px;
+    --sidebar-width: 264px;
+    --sidebar-width-compact: 80px;
+}
+
+/* 画像やフォーム部品が親要素を超えないようにします。 */
+img,
+svg,
+video,
+canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+/* 長い文字列やメールアドレスのはみ出しを防ぎます。 */
+p,
+dd,
+td,
+a,
+.form-help {
+    overflow-wrap: anywhere;
+}
+
+/* キーボード利用者向けのスキップリンクです。 */
+.skip-link {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    z-index: 1000;
+    padding: 10px 14px;
+    border-radius: 10px;
+    color: #ffffff;
+    background: var(--color-primary-dark);
+    transform: translateY(-150%);
+}
+
+.skip-link:focus {
+    transform: translateY(0);
+}
+
+/* スマートフォン用ヘッダーです。 */
+.mobile-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: var(--header-height-mobile);
+    padding:
+        8px
+        max(16px, env(safe-area-inset-right))
+        8px
+        max(16px, env(safe-area-inset-left));
+    border-bottom: 1px solid var(--color-border);
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(14px);
+}
+
+.mobile-header__brand {
+    margin: 0;
+    color: var(--color-primary-dark);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+}
+
+.mobile-header__title {
+    min-width: 0;
+    margin: 0;
+    padding-left: 12px;
+    border-left: 1px solid var(--color-border);
+    overflow: hidden;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* タッチしやすいメニューボタンです。 */
+.menu-button,
+.logout-button,
+.table-actions a,
+.table-actions button {
+    min-width: var(--touch-target);
+    min-height: var(--touch-target);
+}
+
+.menu-button {
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    background: var(--color-surface);
+    cursor: pointer;
+}
+
+.menu-button__bar,
+.menu-button__bar::before,
+.menu-button__bar::after {
+    display: block;
+    width: 20px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--color-text);
+    content: "";
+}
+
+.menu-button__bar {
+    position: relative;
+}
+
+.menu-button__bar::before,
+.menu-button__bar::after {
+    position: absolute;
+    left: 0;
+}
+
+.menu-button__bar::before {
+    top: -6px;
+}
+
+.menu-button__bar::after {
+    top: 6px;
+}
+
+/* 画面全体の基本構成です。 */
+.app-shell {
+    min-height: calc(100dvh - var(--header-height-mobile));
+}
+
+.app-sidebar {
+    position: fixed;
+    inset:
+        var(--header-height-mobile)
+        auto
+        0
+        0;
+    z-index: 70;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: min(86vw, var(--sidebar-width));
+    padding:
+        24px
+        18px
+        max(24px, env(safe-area-inset-bottom));
+    overflow-y: auto;
+    border-right: 1px solid var(--color-border);
+    background: var(--color-surface);
+    box-shadow: 18px 0 44px rgba(23, 32, 51, 0.18);
+    transform: translateX(-105%);
+    transition: transform 220ms ease;
+}
+
+.app-sidebar.is-open {
+    transform: translateX(0);
+}
+
+.sidebar-brand {
+    display: grid;
+    gap: 2px;
+    padding: 0 12px;
+}
+
+.sidebar-brand__name {
+    color: var(--color-primary-dark);
+    font-size: 1.35rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+}
+
+.sidebar-brand__sub {
+    color: var(--color-muted);
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.app-sidebar nav {
+    display: grid;
+    gap: 8px;
+}
+
+.app-sidebar nav a {
+    display: flex;
+    align-items: center;
+    min-height: var(--touch-target);
+    padding: 10px 12px;
+    border-radius: 12px;
+    color: var(--color-text);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.app-sidebar nav a:hover,
+.app-sidebar nav a:focus-visible {
+    color: var(--color-primary-dark);
+    background: #edf3ff;
+}
+
+.app-sidebar nav a[aria-current="page"] {
+    color: var(--color-primary-dark);
+    background: #edf3ff;
+    box-shadow: inset 4px 0 0 var(--color-primary);
+}
+
+.sidebar-user {
+    display: grid;
+    gap: 2px;
+    margin-top: auto;
+    padding: 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+}
+
+.sidebar-user__name {
+    font-weight: 800;
+}
+
+.sidebar-user__role {
+    color: var(--color-muted);
+    font-size: 0.85rem;
+}
+
+.sidebar-user__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--touch-target);
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.logout-button {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    color: var(--color-text);
+    font-weight: 700;
+    background: var(--color-surface);
+    cursor: pointer;
+}
+
+.logout-button:hover {
+    background: #edf3ff;
+}
+
+.sidebar-overlay {
+    position: fixed;
+    inset: var(--header-height-mobile) 0 0;
+    z-index: 60;
+    width: 100%;
+    border: 0;
+    background: rgba(17, 24, 39, 0.48);
+}
+
+.sidebar-overlay[hidden] {
+    display: none;
+}
+
+.app-main {
+    min-width: 0;
+    padding:
+        var(--page-gutter)
+        max(var(--page-gutter), env(safe-area-inset-right))
+        calc(var(--page-gutter) + env(safe-area-inset-bottom))
+        max(var(--page-gutter), env(safe-area-inset-left));
+}
+
+.content-container {
+    width: min(100%, var(--content-max-width));
+    margin-inline: auto;
+}
+
+/* ページ見出しと主要ボタンをスマートフォンでは縦並びにします。 */
+.page-header {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+}
+
+.page-header > .primary-button,
+.page-header > .page-header__actions > * {
+    width: 100%;
+}
+
+/* フォームをモバイルでは1列にします。 */
+.form-grid,
+.settings-grid,
+.contract-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+}
+
+.form-field input:not([type="checkbox"]):not([type="radio"]),
+.form-field select,
+.form-field textarea,
+.money-control input {
+    width: 100%;
+    min-height: 48px;
+    font-size: 1rem; /* 16px以上でスマートフォンの自動ズームを防ぎます。 */
+}
+
+.form-field textarea {
+    min-height: 132px;
+    padding-block: 12px;
+}
+
+/* プラン簡単入力パネルです。 */
+.plan-quick-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    padding: 20px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-medium);
+    background: var(--color-surface);
+}
+
+.plan-quick-form[hidden] {
+    display: none;
+}
+
+.plan-preview {
+    padding: 14px;
+    border-radius: 12px;
+    font-size: clamp(1.05rem, 4vw, 1.35rem);
+    font-weight: 800;
+    background: #edf3ff;
+}
+
+/* スマートフォンではテーブル行をカードへ変換します。 */
+.table-scroll {
+    width: 100%;
+}
+
+.table-scroll--wide {
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-medium);
+    background: var(--color-surface);
+}
+
+.wide-table th,
+.wide-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--color-border);
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.wide-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.responsive-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.responsive-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.responsive-table,
+.responsive-table tbody,
+.responsive-table tr,
+.responsive-table td {
+    display: block;
+    width: 100%;
+}
+
+.responsive-table tr {
+    margin-bottom: 16px;
+    padding: 16px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-medium);
+    background: var(--color-surface);
+    box-shadow: 0 8px 24px rgba(33, 49, 79, 0.06);
+}
+
+.responsive-table tr:last-child {
+    margin-bottom: 0;
+}
+
+.responsive-table td {
+    display: grid;
+    grid-template-columns: minmax(104px, 38%) minmax(0, 1fr);
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--color-border);
+    text-align: left;
+}
+
+.responsive-table td:last-child {
+    border-bottom: 0;
+}
+
+.responsive-table td::before {
+    content: attr(data-label);
+    color: var(--color-muted);
+    font-size: 0.875rem;
+    font-weight: 800;
+}
+
+.responsive-table td.empty-cell {
+    display: block;
+}
+
+.responsive-table td.empty-cell::before {
+    content: none;
+}
+
+.responsive-table .table-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.responsive-table .table-actions::before {
+    width: 100%;
+}
+
+/* タブを横スクロール可能にします。 */
+.tabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: thin;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.tabs a,
+.tabs button {
+    flex: 0 0 auto;
+    min-height: var(--touch-target);
+    white-space: nowrap;
+}
+
+/* フォーム下部の固定操作領域です。 */
+.mobile-sticky-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 30;
+    display: grid;
+    gap: 8px;
+    padding:
+        12px
+        0
+        max(12px, env(safe-area-inset-bottom));
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(244, 247, 251, 0),
+            var(--color-bg) 24%
+        );
+}
+
+/* 契約登録の確認表示（仕様 7.8）です。 */
+.contract-summary {
+    display: grid;
+    gap: 6px;
+    padding: 16px;
+    border-radius: var(--radius-medium);
+    background: #edf3ff;
+}
+
+.contract-summary__title {
+    color: var(--color-muted);
+    font-size: 0.875rem;
+    font-weight: 800;
+}
+
+.contract-summary__text {
+    font-weight: 700;
+}
+
+.selected-plan-price {
+    display: block;
+    padding: 14px 16px;
+    border-radius: 12px;
+    font-size: clamp(1.1rem, 4vw, 1.5rem);
+    font-weight: 800;
+    background: #edf3ff;
+}
+
+.selected-plan-price.is-missing {
+    color: var(--tone-danger-fg);
+    background: var(--tone-danger-bg);
+}
+
+.plan-selector {
+    display: grid;
+    gap: 12px;
+}
+
+.override-panel {
+    padding: 0 16px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-medium);
+    background: var(--color-surface);
+}
+
+.override-panel__summary {
+    min-height: var(--touch-target);
+    padding: 12px 0;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.override-panel > .form-grid {
+    padding-bottom: 16px;
+}
+
+/* 狭いスマートフォン向け調整です。 */
+@media (max-width: 374px) {
+    .login-shell {
+        padding: 12px;
+    }
+
+    .login-card {
+        padding: 24px 18px;
+        border-radius: 18px;
+    }
+
+    .responsive-table td {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+}
+
+/* タブレット表示です。 */
+@media (min-width: 768px) {
+    .page-header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .page-header > .primary-button,
+    .page-header > .page-header__actions > * {
+        width: auto;
+    }
+
+    .bento-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .form-grid,
+    .contract-grid,
+    .filter-bar {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .filter-bar {
+        align-items: end;
+    }
+
+    .filter-bar__actions {
+        grid-column: 1 / -1;
+    }
+
+    .form-field--full,
+    .form-actions,
+    .contract-summary,
+    .plan-selector,
+    .override-panel {
+        grid-column: 1 / -1;
+    }
+
+    .form-actions > * {
+        flex: 0 1 auto;
+    }
+
+    .settings-grid {
+        grid-template-columns: minmax(280px, 0.8fr) minmax(0, 1.4fr);
+        align-items: start;
+    }
+
+    /*
+        「プランを追加」フォームが閉じている間は hidden（display: none）となり
+        グリッドアイテムから外れます。この状態で 2 カラムのままだと、一覧が
+        幅の狭い 1 列目（0.8fr）へ配置されて表がつぶれ、見出しが
+        1 文字ずつ改行されます。フォームが閉じているときは 1 カラムにします。
+    */
+    .settings-grid:has(> .plan-quick-form[hidden]) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .plan-quick-form {
+        position: sticky;
+        top: calc(var(--header-height-mobile) + 20px);
+    }
+
+    .plan-quick-form--page {
+        position: static;
+    }
+
+    .definition-list__row {
+        grid-template-columns: minmax(140px, 28%) minmax(0, 1fr);
+        gap: 16px;
+    }
+
+    .modal__footer > * {
+        flex: 0 1 auto;
+    }
+}
+
+/* PC表示です。 */
+@media (min-width: 1024px) {
+    .mobile-header {
+        display: none;
+    }
+
+    .app-shell {
+        display: grid;
+        grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+        min-height: 100dvh;
+    }
+
+    .app-sidebar {
+        position: sticky;
+        top: 0;
+        inset: auto;
+        z-index: 10;
+        width: auto;
+        height: 100dvh;
+        box-shadow: none;
+        transform: none;
+    }
+
+    .sidebar-overlay {
+        display: none;
+    }
+
+    .app-main {
+        min-width: 0;
+    }
+
+    .bento-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .filter-bar {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .filter-bar__actions {
+        grid-column: auto;
+    }
+
+    .filter-bar--compact {
+        grid-template-columns: minmax(0, 1fr) auto auto;
+    }
+
+    .plan-quick-form {
+        top: 20px;
+    }
+
+    .responsive-table {
+        display: table;
+    }
+
+    .responsive-table thead {
+        position: static;
+        width: auto;
+        height: auto;
+        overflow: visible;
+        clip-path: none;
+        white-space: normal;
+    }
+
+    .responsive-table tbody {
+        display: table-row-group;
+    }
+
+    .responsive-table tr {
+        display: table-row;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        box-shadow: none;
+    }
+
+    .responsive-table th,
+    .responsive-table td {
+        display: table-cell;
+        width: auto;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--color-border);
+        vertical-align: middle;
+    }
+
+    /*
+        見出しは折り返しません。
+        日本語は単語区切りが無いため、列幅が足りないと 1 文字ずつ改行され
+        「現在金額」が縦書きのように見えてしまいます。nowrap で 1 行に固定し、
+        入りきらない場合は .table-scroll 側の横スクロールで逃がします。
+    */
+    .responsive-table th {
+        white-space: nowrap;
+    }
+
+    /*
+        短い値の列（コード・種類・金額・支払単位・状態）は値も折り返しません。
+        「医療」「有効」が 1 文字ずつ改行されて縦書きに見えるのを防ぎます。
+    */
+    .responsive-table td.is-nowrap {
+        white-space: nowrap;
+    }
+
+    /*
+        プラン名だけは長くなるため折り返しを許しますが、幅が狭すぎると
+        やはり 1 文字ずつ改行されるため下限を設けます。
+    */
+    .responsive-table td.plan-name-cell {
+        min-width: 10em;
+    }
+
+    .responsive-table td::before {
+        content: none;
+    }
+
+    .responsive-table .table-actions {
+        display: table-cell;
+        white-space: nowrap;
+    }
+
+    .responsive-table .table-actions > * {
+        margin-right: 6px;
+    }
+
+    /*
+        overflow: hidden だと、見出しを nowrap にしたときに列が切れて読めなくなります。
+        横方向はスクロールさせ、縦方向のみクリップして角丸を保ちます。
+    */
+    .table-scroll:has(.responsive-table) {
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-medium);
+        background: var(--color-surface);
+        overflow-x: auto;
+        overflow-y: hidden;
+        overscroll-behavior-inline: contain;
+    }
+
+    .mobile-sticky-actions {
+        position: static;
+        display: flex;
+        justify-content: flex-end;
+        background: transparent;
+    }
+}
+
+/* ワイドPC表示です。 */
+@media (min-width: 1440px) {
+    .bento-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+/* 横向きスマートフォンで高さが不足する場合の調整です。 */
+@media (max-height: 520px) and (orientation: landscape) {
+    .app-sidebar {
+        padding-top: 12px;
+    }
+
+    .login-shell {
+        align-items: start;
+    }
+}
+
+/* 動きを減らす設定を尊重します。 */
+@media (prefers-reduced-motion: reduce) {
+    .app-sidebar {
+        transition: none;
+    }
+}

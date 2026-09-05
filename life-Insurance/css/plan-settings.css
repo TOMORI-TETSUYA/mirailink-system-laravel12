@@ -1,0 +1,148 @@
+/* =====================================================================
+   MiraiLink - plan-settings.css
+   プラン設定画面固有のスタイル（詳細項目の展開、履歴モーダル等）
+   ===================================================================== */
+
+.plan-quick-form__title {
+    font-size: 1.1rem;
+}
+
+.plan-details {
+    display: grid;
+    gap: 16px;
+    padding-top: 16px;
+    border-top: 1px dashed var(--color-border);
+}
+
+.plan-details[hidden] {
+    display: none;
+}
+
+.plan-list {
+    display: grid;
+    gap: 16px;
+    min-width: 0;
+}
+
+/* ---------------------------------------------------------------------
+   保険分類の選択（生命保険 / 損害保険 / 法人様向け保険）
+   分類名だけでは判断しにくいため、説明文を各選択肢に併記します。
+   --------------------------------------------------------------------- */
+
+.category-choice {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.category-choice__options {
+    display: grid;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.category-option {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+    padding: 12px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-medium);
+    background: var(--color-surface);
+    cursor: pointer;
+}
+
+.category-option:hover {
+    border-color: var(--color-primary);
+}
+
+/* 選択中の分類を枠線で明示します。 */
+.category-option:has(input:checked) {
+    border-color: var(--color-primary);
+    box-shadow: inset 0 0 0 1px var(--color-primary);
+}
+
+/* キーボード操作でも選択位置が分かるようにします。 */
+.category-option:has(input:focus-visible) {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+.category-option input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    margin: 2px 0 0;
+}
+
+.category-option__body {
+    display: grid;
+    gap: 4px;
+}
+
+.category-option__name {
+    font-weight: 800;
+}
+
+.category-option__description {
+    color: var(--color-muted);
+    font-size: 0.85rem;
+    line-height: 1.6;
+}
+
+/* 一覧上部に置く分類の凡例です。 */
+.category-legend {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 14px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-medium);
+    background: var(--color-surface);
+}
+
+.category-legend__title {
+    margin: 0;
+    color: var(--color-muted);
+    font-size: 0.85rem;
+    font-weight: 800;
+}
+
+.category-legend__item {
+    display: grid;
+    gap: 2px;
+    margin: 0;
+}
+
+.category-legend__term {
+    font-size: 0.9rem;
+    font-weight: 800;
+}
+
+.category-legend__description {
+    margin: 0;
+    color: var(--color-muted);
+    font-size: 0.85rem;
+    line-height: 1.6;
+}
+
+[data-plan-details-toggle]::before {
+    display: inline-block;
+    margin-right: 6px;
+    transition: transform 160ms ease;
+    content: "▸";
+}
+
+[data-plan-details-toggle][aria-expanded="true"]::before {
+    transform: rotate(90deg);
+}
+
+.settings-grid--edit {
+    align-items: start;
+}
+
+@media (min-width: 768px) {
+    .settings-grid--edit {
+        grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+    }
+}

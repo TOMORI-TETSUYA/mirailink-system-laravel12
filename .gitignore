@@ -1,0 +1,20 @@
+.env
+/life-Insurance_app/vendor/
+/life-Insurance_app/storage/*.key
+/life-Insurance_app/storage/logs/*
+!/life-Insurance_app/storage/logs/.gitkeep
+/life-Insurance_app/storage/framework/cache/data/*
+/life-Insurance_app/storage/framework/sessions/*
+/life-Insurance_app/storage/framework/views/*
+/life-Insurance_app/storage/framework/testing/*
+!/life-Insurance_app/storage/framework/**/.gitkeep
+/life-Insurance/storage
+/life-Insurance/hot
+*.csv
+*.sql
+# 上の *.sql はスラッシュを含まないため任意の階層にマッチします。
+# DB 初期化スクリプトは必ずリポジトリに含める必要があるため除外を打ち消します。
+!/docker/mysql/initdb/*.sql
+*.bak
+.phpunit.result.cache
+.DS_Store

@@ -1,0 +1,8 @@
+.git
+.env
+life-Insurance_app/vendor
+life-Insurance_app/storage/logs
+life-Insurance_app/node_modules
+*.csv
+*.sql
+*.bak
