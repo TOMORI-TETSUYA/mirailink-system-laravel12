@@ -26,6 +26,8 @@
         defer
     ></script>
     <script src="@appAsset('js/modal.js')" defer></script>
+    {{-- 左メニューとボタン型リンクの URL 表示（ブラウザ左下）を抑止します。 --}}
+    <script src="@appAsset('js/link-guard.js')" defer></script>
 
     @stack('scripts')
 </head>

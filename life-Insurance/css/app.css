@@ -126,6 +126,14 @@ h3 {
     white-space: nowrap;
 }
 
+/*
+   js/link-guard.js が href を外したリンク。
+   href の無い <a> は既定でポインタカーソルにならないため補います。
+*/
+.is-guarded-link {
+    cursor: pointer;
+}
+
 .mono {
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 0.95em;
