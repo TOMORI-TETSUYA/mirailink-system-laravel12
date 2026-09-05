@@ -2,6 +2,10 @@
 
 @section('title', '顧客更新')
 
+@push('styles')
+    <link rel="stylesheet" href="@appAsset('css/address.css')">
+@endpush
+
 @section('content')
     <section class="page-header">
         <div>

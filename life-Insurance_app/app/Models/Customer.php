@@ -22,12 +22,29 @@ final class Customer extends Model
         'inactive' => '取引終了',
     ];
 
+    /** 都道府県（JIS X 0401 の順）。入力揺れを防ぐため選択式にします。 */
+    public const PREFECTURES = [
+        '北海道', '青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県',
+        '茨城県', '栃木県', '群馬県', '埼玉県', '千葉県', '東京都', '神奈川県',
+        '新潟県', '富山県', '石川県', '福井県', '山梨県', '長野県',
+        '岐阜県', '静岡県', '愛知県', '三重県',
+        '滋賀県', '京都府', '大阪府', '兵庫県', '奈良県', '和歌山県',
+        '鳥取県', '島根県', '岡山県', '広島県', '山口県',
+        '徳島県', '香川県', '愛媛県', '高知県',
+        '福岡県', '佐賀県', '長崎県', '熊本県', '大分県', '宮崎県', '鹿児島県', '沖縄県',
+    ];
+
     protected $fillable = [
         'customer_code',
         'name',
         'name_kana',
         'birth_date',
-        'address',
+        'postal_code',
+        'prefecture',
+        'city',
+        'address_line1',
+        'address_line2',
+        'building',
         'phone',
         'phone_hmac',
         'email',
@@ -52,7 +69,13 @@ final class Customer extends Model
             'name' => 'encrypted',
             'name_kana' => 'encrypted',
             'birth_date' => 'encrypted',
-            'address' => 'encrypted',
+            // 住所は機微情報のため、分割した各列もすべて暗号化します（仕様 6.8）。
+            'postal_code' => 'encrypted',
+            'prefecture' => 'encrypted',
+            'city' => 'encrypted',
+            'address_line1' => 'encrypted',
+            'address_line2' => 'encrypted',
+            'building' => 'encrypted',
             'phone' => EncryptedSearchable::class.':phone',
             'email' => EncryptedSearchable::class.':email',
             'occupation' => 'encrypted',
@@ -127,6 +150,26 @@ final class Customer extends Model
     public function getStatusLabelAttribute(): string
     {
         return self::STATUSES[$this->status] ?? $this->status;
+    }
+
+    /** 郵便番号を除いた住所を 1 行へ連結します。未入力の項目は詰めます。 */
+    public function getFullAddressAttribute(): string
+    {
+        return implode(' ', array_filter([
+            $this->prefecture,
+            $this->city,
+            $this->address_line1,
+            $this->address_line2,
+            $this->building,
+        ], static fn (?string $part): bool => $part !== null && $part !== ''));
+    }
+
+    /** 「〒123-4567」形式。未入力なら空文字を返します。 */
+    public function getPostalCodeLabelAttribute(): string
+    {
+        return $this->postal_code === null || $this->postal_code === ''
+            ? ''
+            : '〒'.$this->postal_code;
     }
 
     public function getIntentionStatusLabelAttribute(): string

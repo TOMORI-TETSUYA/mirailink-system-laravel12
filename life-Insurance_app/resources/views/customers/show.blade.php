@@ -62,7 +62,8 @@
                 <div class="definition-list__row"><dt>氏名</dt><dd>{{ $customer->name }}</dd></div>
                 <div class="definition-list__row"><dt>氏名カナ</dt><dd>{{ $customer->name_kana ?: '-' }}</dd></div>
                 <div class="definition-list__row"><dt>生年月日</dt><dd>{{ $customer->birth_date ?: '-' }}</dd></div>
-                <div class="definition-list__row"><dt>住所</dt><dd>{{ $customer->address ?: '-' }}</dd></div>
+                <div class="definition-list__row"><dt>郵便番号</dt><dd>{{ $customer->postal_code_label ?: '-' }}</dd></div>
+                <div class="definition-list__row"><dt>住所</dt><dd>{{ $customer->full_address ?: '-' }}</dd></div>
                 <div class="definition-list__row"><dt>電話番号</dt><dd>{{ $customer->phone ?: '-' }}</dd></div>
                 <div class="definition-list__row"><dt>メールアドレス</dt><dd>{{ $customer->email ?: '-' }}</dd></div>
                 <div class="definition-list__row"><dt>勤務先・職業</dt><dd>{{ $customer->occupation ?: '-' }}</dd></div>

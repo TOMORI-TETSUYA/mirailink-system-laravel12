@@ -22,7 +22,7 @@ final class UpdateCustomerRequest extends FormRequest
             'name' => ['required', 'string', 'max:100'],
             'name_kana' => ['nullable', 'string', 'max:100'],
             'birth_date' => ['nullable', 'date', 'before_or_equal:today'],
-            'address' => ['nullable', 'string', 'max:300'],
+            ...StoreCustomerRequest::addressRules(),
             'phone' => ['nullable', 'string', 'max:20', 'regex:/^[0-9０-９+\-() ]+$/u'],
             'email' => ['nullable', 'email:rfc', 'max:254'],
             'occupation' => ['nullable', 'string', 'max:150'],

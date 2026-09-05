@@ -46,7 +46,11 @@ services:
     ports:
       - "${APP_PORT:-8080}:80"
     volumes:
-      - ./:/var/www/html:ro
+      # nginx が読むのは公開ディレクトリ（15ファイル程度）だけです。
+      # リポジトリ全体（vendor を含む約8400ファイル）を共有すると、
+      # Windows のファイル共有層への負荷が跳ね上がり、停止の原因になります。
+      # PHP へは SCRIPT_FILENAME を文字列で渡すだけなので、アプリ本体は不要です。
+      - ./life-Insurance:/var/www/html/life-Insurance:ro
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       - app

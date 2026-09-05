@@ -1,0 +1,79 @@
+/* =====================================================================
+   MiraiLink - address.css
+   顧客の住所入力（郵便番号・都道府県・市区町村・住所1・住所2・建物名）
+   ===================================================================== */
+
+/*
+   住所はまとまりが分かるよう枠で囲みます。
+   fieldset の既定余白を打ち消してから内側の間隔を指定します。
+*/
+.address-block {
+    margin: 0;
+    padding: 16px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-medium);
+    background: var(--color-surface);
+}
+
+.address-block__legend {
+    padding: 0 6px;
+    font-size: 0.95rem;
+    font-weight: 800;
+}
+
+/*
+   日本の住所の記入順（郵便番号 → 都道府県 → 市区町村 → 番地）に
+   1 項目ずつ縦へ並べます。
+*/
+.address-block__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+}
+
+/*
+   入力欄の幅。
+   .form-field の入力欄は width: 100% のため、max-width で内容量に合わせます。
+
+   計算の内訳（app.css の指定より）:
+     左右パディング  var(--space-4) × 2 = 32px
+     枠線            1px × 2            =  2px
+   合計 34px を、収めたい文字数ぶんの幅へ加算します。
+   全角（漢字・かな）は 1em、半角数字は 1ch です。
+*/
+
+/* 「123-4567」の 8 文字が収まる幅。
+   補足説明が入力欄より長いため、囲みは全幅のままにして入力欄だけ狭めます。 */
+.address-block__postal input {
+    max-width: calc(9ch + 34px);
+}
+
+/*
+   都道府県と市区町村の横並び。
+   画面が狭いときは折り返して縦に積みます。
+*/
+.address-block__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px 18px;
+    align-items: start;
+}
+
+/*
+   この 2 項目は補足説明を持たないため、囲みごと必要幅にします。
+   末尾の 2px は、小数点以下の丸めで最後の 1 文字が欠けないための余裕です。
+*/
+
+/* 漢字 5 文字ぶん。select は右端の矢印に約 24px 必要です。 */
+.address-block__prefecture {
+    flex: 0 0 auto;
+    width: calc(5em + 34px + 24px + 2px);
+}
+
+/* 漢字 12 文字ぶん。 */
+.address-block__city {
+    flex: 0 0 auto;
+    width: calc(12em + 34px + 2px);
+}
+
+/* 番地・建物名は長くなるため全幅のままにします。 */

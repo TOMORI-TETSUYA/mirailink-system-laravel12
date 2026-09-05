@@ -23,9 +23,7 @@
     </select>
 </x-field>
 
-<x-field name="address" label="住所" full>
-    <input type="text" id="address" name="address" value="{{ old('address', $customer?->address) }}" maxlength="300" autocomplete="off">
-</x-field>
+<x-address-fields :customer="$customer" />
 
 <x-field name="phone" label="電話番号" help="数字とハイフンで入力します。完全一致検索のみ対応します。">
     <input type="tel" id="phone" name="phone" value="{{ old('phone', $customer?->phone) }}" maxlength="20" inputmode="tel" autocomplete="off">

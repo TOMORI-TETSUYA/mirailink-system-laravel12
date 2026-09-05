@@ -52,6 +52,44 @@ docker compose exec app ./vendor/bin/phpunit
 - `phpunit.xml` の `<server>` 要素は**削除しないでください**。compose が `DB_CONNECTION=mysql` などを実環境変数としてコンテナへ渡すため、これが無いとテストが sqlite の `:memory:` ではなく開発用 MySQL に接続し、`RefreshDatabase` が開発データを消去します。`<env force="true">` だけでは不十分です（PHPUnit は `$_ENV` と `putenv()` しか更新せず、Laravel の `env()` は `$_SERVER` を優先して読むため）。理由は `phpunit.xml` のコメントに記載しています。
 - イメージタグ（`php:8.4.23-fpm-bookworm` / `mysql:8.4.10` / `nginx:1.28.3-alpine`）は仕様書の指定値です。レジストリに存在しない場合は `.env` の `PHP_IMAGE` / `MYSQL_IMAGE` / `NGINX_IMAGE` で差し替えてください（例: `php:8.4-fpm-bookworm`, `mysql:8.4`, `nginx:1.28-alpine`）。私はレジストリの存在確認ができないため、ここは断定していません。
 
+### 「読み込み中」のまま画面が開かないとき
+
+コンテナは `Up` なのにブラウザが応答を待ち続ける場合、アプリの不具合ではなく
+**Docker Desktop のファイル共有（バインドマウント）が停止している**可能性があります。
+
+切り分け方法（コンテナ自身のファイルは読めるのに、マウント配下だけ固まるのが特徴です）。
+
+```bash
+# 1. コンテナ内のファイル → OK なら Docker 自体は生きている
+docker compose exec -T nginx sh -c 'timeout 8 cat /etc/nginx/nginx.conf >/dev/null && echo OK || echo NG'
+
+# 2. マウント配下 → ここだけ NG / タイムアウトならファイル共有の停止
+docker compose exec -T nginx sh -c 'timeout 8 cat /var/www/html/life-Insurance/robots.txt >/dev/null && echo OK || echo NG'
+```
+
+2 が NG のときは `docker compose restart` では復旧しません。Docker エンジンごと再起動します。
+
+```bash
+docker desktop restart
+docker compose up -d
+```
+
+`mysql_data` は名前付きボリュームのため、この操作でデータは失われません。
+nginx のアクセスログが途中で止まっていること、`stat() failed (5: I/O error)` が出ることも同じ症状の目印です。
+
+#### 実施済みの軽減策（元に戻さないでください）
+
+| 箇所 | 内容 | 理由 |
+| --- | --- | --- |
+| `docker-compose.yml` の nginx | マウントを `./life-Insurance` のみに限定 | nginx が必要とするのは公開ディレクトリの約15ファイルだけです。以前はリポジトリ全体（`vendor` を含む約8,400ファイル）を共有しており、ファイル共有層への負荷が過大でした。PHP へは `SCRIPT_FILENAME` を文字列で渡すだけなので、アプリ本体は不要です |
+| `docker/nginx/default.conf` | `sendfile off;` + `aio threads;` | ファイル読み込みをワーカーからスレッドプールへ移し、共有層が遅延しても全ワーカーが専有されて無応答になるのを防ぎます |
+| 同上 | `open_file_cache` | 同じファイルの `stat()` / `open()` の繰り返しを減らします。開発中の更新が遅れて見えないよう `valid` は 10 秒と短くしています |
+
+app コンテナは引き続きリポジトリ全体（約8,400ファイル、うち `vendor/` が約7,961）を共有しています。
+`vendor/` を名前付きボリュームへ移すと共有ファイルは約470まで減りますが、Windows 側から
+`vendor/` が見えなくなり IDE の PHP 補完が効かなくなるため、現時点では採用していません。
+再発が続く場合はこの変更を検討してください。
+
 ### アプリのログイン情報（ローカル開発用）
 
 手順 5 の `app:create-admin` で作成した初期管理者です。

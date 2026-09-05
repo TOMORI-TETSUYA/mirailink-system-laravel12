@@ -2,6 +2,10 @@
 
 @section('title', '顧客登録')
 
+@push('styles')
+    <link rel="stylesheet" href="@appAsset('css/address.css')">
+@endpush
+
 @section('content')
     <section class="page-header">
         <div>
